@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+    <class name="one2one.EmployeeAddress" table="employee_address">
+        <id name="empAddId" type="java.lang.Integer" >
+            <column name="ea_emp_id"/>
+           <generator class="foreign">
+           <param name="property">employee</param> 
+           </generator>
+        </id>
+        <property name="empAddstate" type="string"><column name="ea_state"/></property>
+        <property name="empAddcountry" type="string"><column name="ea_country"/></property> 
+        <one-to-one name="employee" class="one2one.Employee" 
+                    constrained="true">
+        </one-to-one>
+        
+    </class>
+    
+</hibernate-mapping>

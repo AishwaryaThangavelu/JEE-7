@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+
+<hibernate-mapping>
+    <class name="one2many.University" table="university" schema="aish" >
+        <id name="univId" type="java.lang.Integer">
+            <column name="univ_id" />
+           <generator class="increment" /> 
+        </id>
+        <property name="univName" type="string">
+            <column name="univ_name" />
+        </property>
+        
+        <set name="studentSet" table="student" inverse="true" lazy="true" fetch="select" cascade="all">
+            <key>
+                <column name="st_univ_id" />
+            </key>
+            <one-to-many class="one2many.Student" />
+        </set>
+        
+    </class>
+</hibernate-mapping>

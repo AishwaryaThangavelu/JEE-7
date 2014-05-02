@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+    <class name="aish.vaishno.hibernatesample.FoodOrder" table="food_order" schema="aish" >
+        <id name="id" type="java.lang.Long">
+            <column name="food_id" />
+           <generator class="assigned" /> 
+        </id>
+        <property name="itemName" type="string">
+            <column name="item_name" />
+        </property>
+    </class>
+</hibernate-mapping>
