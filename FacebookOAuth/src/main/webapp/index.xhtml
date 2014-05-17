@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+    </h:head>
+    <h:body>
+        <h:form>
+        <h1>Login Page 1233</h1>
+        <h:outputText value="#{FBHelperBean.getLoginRedirectUrl()}" />
+        <br/><br/><br/>
+        <p:button value="Facebook Connect" href="#{FBHelperBean.getLoginRedirectUrl()}" />
+         
+            <br/><br/>
+        </h:form>   
+         </h:body>
+</html>

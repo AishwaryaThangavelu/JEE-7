@@ -1,0 +1,138 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package aish.vaishno.facebookoauth.access;
+
+import com.restfb.json.JsonObject;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import org.apache.commons.io.IOUtils;
+
+/**
+ *
+ * @author aishwarya
+ */
+@Path(value = "FBHelperBean")
+@ManagedBean(name = "FBHelperBean")
+@SessionScoped
+public class FaceBookHelper {
+
+    private static final String CLIENT_TOKEN = "8ef9db2931b2e80e1daebeddcb784093";
+    private static final String APP_SECRET = "e5f46b0c7e5716de90ae5338b9ca4e1f";
+    private static final String APP_ID = "1502661543287340";
+    private static final String REDIRECT_URI = "http://localhost:49066/FacebookOAuth/webresources/FBHelperBean/code";
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @Path(value = "loginRedirectUrl")
+    public String getLoginRedirectUrl() {
+        HttpSession session
+                = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+        System.out.println("******* SESSION ID: " + session.getId());
+        String returnValue = "https://graph.facebook.com/oauth/authorize?client_id="
+                + APP_ID + "&redirect_uri=" + REDIRECT_URI
+                + "&scope=email";
+        return returnValue;
+    }
+
+    /*    public String getAuthCode(@Context HttpServletRequest req) {
+     String authCode=req.getParameter("code");
+     return authCode;
+     }
+    
+     */
+    private String getAccessToken(String authCode) {
+        String result = null;
+        String accessToken = null;
+        String expires = null;
+        try {
+            System.out.println("AUTH CODE: " + authCode);
+            String authUrl = "https://graph.facebook.com/oauth/access_token?client_id="
+                    + APP_ID + "&redirect_uri="
+                    + REDIRECT_URI + "&client_secret=" + APP_SECRET + "&code=" + authCode;
+            URL url = new URL(authUrl);
+            result = getReadUrl(url);
+            String[] splitRec = result.split("&");
+            System.out.println("String[]"+splitRec[0]);
+            for (String string : splitRec) {
+                String[] indRec = string.split("=");
+                System.out.println("*******ACCESS TOKEN: "+indRec[1]);
+                if ("access_token".equalsIgnoreCase(indRec[0])) {
+                    accessToken = indRec[1];
+                }
+                if ("expires".equalsIgnoreCase(indRec[0])) {
+                    expires = indRec[1];
+                } else {
+                    System.out.println("No Rec Found");
+                }
+            }
+            System.out.println("baos.toByteArray(): " + result);
+
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(FaceBookHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return accessToken;
+    }
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @Path(value = "code")
+    public String authorizeFacebookLogin(@Context HttpServletRequest req) {
+        JsonObject jsonObject = null;
+        try {
+            String authCode = req.getParameter("code");
+            String accessToken = getAccessToken(authCode);
+            URL url = new URL("https://graph.facebook.com/me?access_token=" + accessToken);
+            jsonObject = new JsonObject(IOUtils.toString(url));
+            jsonObject.getString("id");
+            jsonObject.getString("first_name");
+            jsonObject.getString("last_name");
+        } catch (IOException ex) {
+            Logger.getLogger(FaceBookHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return jsonObject.getString("first_name");
+    }
+
+    private String getReadUrl(URL url) {
+        InputStream is = null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            is = url.openStream();
+            int r;
+            while ((r = is.read()) != -1) {
+                baos.write(r);
+
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(FaceBookHelper.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(FaceBookHelper.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return new String(baos.toByteArray());
+    }
+
+}
